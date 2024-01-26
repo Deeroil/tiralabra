@@ -3,7 +3,18 @@ import string
 # https://www.geeksforgeeks.org/lzw-lempel-ziv-welch-compression-technique/
 # https://www2.cs.duke.edu/csed/curious/compression/lzw.html
 
-def lzw_compression(decompressed):
+def lzw_compression(decompressed: string):
+  '''
+  Lempel-Ziv-Welch kompressioalgoritmi
+
+  Ottaa vastaan: merkkijonon
+  Palauttaa: Listan indeksejä, joka on kompressoitu versio merkkijonosta
+
+  esim.
+  Parametri: "banana_bandana"
+  Palauttaa: [98, 97, 110, 257, 97, 95, 256, 110, 100, 259]
+  '''
+
   string_table = [chr(i) for i in range(256)]
   output_file = []
  
@@ -23,10 +34,21 @@ def lzw_compression(decompressed):
     index += 1
   
   output_file.append(string_table.index(s))
+  print(output_file)
   return output_file
 
-def lzw_decompression(compressed):
-  # print("compr", compressed)
+def lzw_decompression(compressed: list):
+  '''
+  Lempel-Ziv-Welch dekompressioalgoritmi
+  
+  Parametri: lista indeksejä, kompressoitu versio merkkijonosta
+  Palauttaa: merkkijono joka saadaan purkamalla kompressio
+
+  esim
+  Parametri: [98, 97, 110, 257, 97, 95, 256, 110, 100, 259]
+  Palauttaa: "banana_bandana"
+  '''
+  print("compr", compressed)
   output_file = []
   string_table = [chr(i) for i in range(256)]
   entry = ''
@@ -57,10 +79,10 @@ def lzw_decompression(compressed):
 
 if __name__ == "__main__":
   test_string = "banana_bandana"
-  test_string = "kokkola kokakola koko kokko lakko"
+  # test_string = "kokkola kokakola koko kokko lakko"
   compr = lzw_compression(test_string)
   output = lzw_decompression(compr)
-  
+
   print("compressed:", compr)
   print("after decomp:", output)
   if test_string == output:
