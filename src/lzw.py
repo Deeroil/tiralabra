@@ -87,17 +87,3 @@ class LZW:
             decompressed += string_table[i]
 
         return decompressed
-
-
-if __name__ == "__main__":
-    # test_string = "banana_bandana"
-    test_string = "kokkola kokakola koko kokko lakko"
-
-    lzw = LZW()
-    compr = lzw.compression(test_string)
-    output = lzw.decompression(compr)
-
-    print("compressed:", compr)
-    print("after decomp:", output)
-    if test_string == output:
-        print("match!")
