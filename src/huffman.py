@@ -1,7 +1,18 @@
 import heapq
 
+## TODO:
+##    - huffman tree: traversing and adding binary values
+##    - check if the tree works :D
+##    - save as a binary file
+##    - decompression to string
+##    - add tests
+
 
 class Node:
+    """
+    Luokka solmuille Huffman-puuta varten
+    """
+
     def __init__(self, frequency, character, left=None, right=None):
         self.frequency = frequency
         self.character = character
@@ -10,116 +21,92 @@ class Node:
 
 
 class HuffmanTree:
+    """
+    Huffman-puun luominen Huffman algoritmin soveltamiseen.
+    Vielä kovin kesken.
+    """
+
     def __init__(self, data):
         self.minheap = []
         self.data = data
 
         self.root = None
         self.nodes = []
-        self.leaves = []
 
         for i in data:
             heapq.heappush(self.minheap, i)
             node = Node(i[0], i[1], None, None)
             self.nodes.append(node)
-            self.leaves.append(node)
 
-        print("minheap", self.minheap)
-        print("nodes", self.nodes)
-
-    # vain mergessä nyt
-    def add(self, freq, char, left, right):
-        # tää pitää muokata jotenkin, mihin me halutaan root?
-        if not self.root:
-            self.root = Node(freq, char, left, right)
-            return
-
-        node = self.root
-        while True:
-            if node.frequency == freq and node.character == char:
-                return
-            if node.frequency > freq:
-                if not node.left:
-                    node.left = Node(freq, char, left, right)
-                    return
-                node = node.left
-            else:
-                if not node.right:
-                    node.right = Node(freq, char, left, right)
-                    return
-                node = node.right
+        while len(self.minheap) > 1:
+            self.merge()
 
     def merge(self):
-        # ei toimi näin, inner nodet pitää muistaa huomioida
+        """
+        Poistaa minimikeosta kaksi pienintä solmua a ja b.
+        Lisää minimikekoon näistä johdetun solmun
+        ja asettaa juurisolmun jos on sen aika
+        """
+
         a = heapq.heappop(self.minheap)
         b = heapq.heappop(self.minheap)
-        print("a", a)
-        print("b", b)
         node_a = Node(a[0], a[1])
         node_b = Node(b[0], b[1])
 
-        #lisätään inner nodea vastaava node minheappiin
-        heapq.heappush(self.minheap, (a[0]+b[0], a[1]+b[1]))
-        print("mergessä minheap", self.minheap)
-        # self.add(a[0] + b[0], None, node_a, node_b)
+        heapq.heappush(self.minheap, (a[0] + b[0], a[1] + b[1]))
 
         node_n = Node(a[0] + b[0], None, node_a, node_b)
         self.nodes.append(node_n)
 
-    # def __contains__(self, value):
-    #     if not self.root:
-    #         return False
-
-    #     node = self.root
-    #     while node:
-    #         if node.value == value:
-    #             return True
-    #         if node.value > value:
-    #             node = node.left
-    #         else:
-    #             node = node.right
-    #     return False
-
-    # merkkijonoesitys alkioista listana
-    def __repr__(self):
-        items = []
-        self.traverse(self.root, items)
-        return str(items)
-
-    def traverse(self, node, items):
-        if not node:
-            return
-        self.traverse(node.left, items)
-        items.append((node.frequency, node.character))
-        self.traverse(node.right, items)
-
-    def __len__(self):
-        items = []
-        self.traverse(self.root, items)
-        return len(items)
-
+        if len(self.minheap) == 1:
+            self.root = node_n
 
 class Huffman:
     """
-    Huffman-koodilla pakkaaminen ja purkaminen
-    Tää versio ei käytössä, teen HuffmanTreessä just nyt vain
+    Huffman-koodilla pakkaaminen ja purkaminen.
+    Vielä erittäin kesken
     """
 
-    def compression(self, data):
-        # eka pitäis käydä läpi montaako merkkiä tässä on :D
-        n = 6  # tää perustuu nyt GeeksForGeeks esimerkkiin nii otin vaa 6
+    def compression(self, data: str):
+        """
+        Huffman-koodaus, kompressio. WIP
 
-        heap = []
-        for d in data:
-            node = Node(d[0], d[1])
-            heapq.heappush(heap, node)
+        Parametri: merkkijonomuodossa oleva kompressoitava data
+        """
+        datalist = self.create_frequencylist(data)
+        tree = HuffmanTree(datalist)
 
-        while True:
-            left = heapq.heappop(heap)
-            right = heapq.heappop(heap)
-            freq_z = left[0] + right[0]
-            z = Node(freq_z, None, left, right)
-            heapq.heappush(heap, z)
+        print("root", tree.root.frequency)
+
+        # TODO: assign binary values to letters
+        #         - traverse to leaf, save path of L/R w/ 1 and 0?
+
+    def create_frequencylist(self, data: str):
+        """
+        Luo frekvensseistä listan joka voidaan syöttää Huffman-puulle
+
+        Parametri: merkkijonomuodossa oleva data
+        Palauttaa: listan tupleja.
+
+        Esimerkiksi:
+        Parametri: "abac"
+        Palauttaa: [(2, a), (1, b), (1, c)]
+        """
+        characters = []
+        data_frequencies = []
+
+        for i in range(len(data)):
+            if data[i] not in characters:
+                characters.append(data[i])
+                data_frequencies.append((1))
+            else:
+                ind = characters.index(data[i])
+                data_frequencies[ind] += 1
+
+        tuple_list = []
+        for i in range(len(characters)):
+            tuple_list.append((data_frequencies[i], characters[i]))
+        return tuple_list
 
     def decompression(self, compressed):
         pass
@@ -127,20 +114,7 @@ class Huffman:
 
 if __name__ == "__main__":
     example_data = [(9, "b"), (5, "a"), (12, "c"), (13, "d"), (16, "e"), (45, "f")]
-    # tree = HuffmanTree(example_data)
+    example_str = "bfbbfafdddfbcccffefcccffdddddbfffecfffacfbbfaafcfefafccfffcfefffdddfffefffddffffeffffbbfeeeeeeeeeeff"
 
-    # while len(tree.minheap) > 0:
-    #   tree.merge()
-    #   print(tree)
-
-    huff = HuffmanTree(example_data)
-    # print(h.minheap)
-
-    while len(huff.minheap) > 1:
-      huff.merge()
-    
-    for i in huff.nodes:
-      print(i.frequency, i.character)
-      
-      if i.left or i.right:
-        print(i.left, i.right)
+    huffman = Huffman()
+    huffman.compression(example_str)
