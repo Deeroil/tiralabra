@@ -14,9 +14,6 @@ with open("./src/tests/loremipsum.txt") as f:
 with open("./src/tests/lorem_longer.txt") as f:
     lorem_longer = f.read()
 
-with open("./src/tests/pg26096.txt") as f:
-    book = f.read()
-
 with open("./src/tests/loremlorem.txt") as f:
     loremlorem = f.read()
 
@@ -57,31 +54,10 @@ class TestLZW(unittest.TestCase):
         self.assertEqual(lorem_ipsum, decompr)
 
     def test_longer_lorem_ipsum_compresses_and_decompresses(self):
+        # add some longer text here and test how much it compresses
         compr = self.lzw.compression(lorem_longer)
         decompr = self.lzw.decompression(compr)
         self.assertEqual(lorem_longer, decompr)
-
-    # def test_shorter_lorem_ipsum_sizes(self):
-    #     compr = self.lzw.compression(lorem_ipsum)
-    #     # decompr = self.lzw.decompression(compr)
-    #     original_size = sys.getsizeof(lorem_ipsum)
-    #     compressed_size = sys.getsizeof(compr)
-    #     self.assertEqual(original_size, compressed_size)
-
-    # def test_longer_lorem_ipsum_sizes(self):
-    #     #  this doesnt really compress :/
-    #     compr = self.lzw.compression(lorem_longer)
-    #     original_size = sys.getsizeof(lorem_longer)
-    #     compressed_size = sys.getsizeof(compr)
-
-    #     self.assertGreater(original_size, compressed_size)
-
-    # def test_longer_lorem_ipsum_compresses_and_decompresses(self):
-    #     # add some longer text here and test how much it compresses
-    #     compr = self.lzw.compression(lorem_longer)
-    #     decompr = self.lzw.decompression(compr)
-    #     self.assertEqual(lorem_longer, decompr)
-
 
     def test_loremlorem_ipsum_is_(self):
         compr = self.lzw.compression(loremlorem)
@@ -94,13 +70,6 @@ class TestLZW(unittest.TestCase):
         compr = self.lzw.compression(customers100)
         decompr = self.lzw.decompression(compr)
         self.assertEqual(customers100, decompr)
-
-    # def test_10000_customers_compresses_and_decompresses(self):
-    #     # add some longer text here and test how much it compresses
-    #     compr = self.lzw.compression(customers)
-    #     decompr = self.lzw.decompression(compr)
-    #     self.assertEqual(customers, decompr)
-
 
     # def test_book_compresses_and_decompresses(self):
     #     # add some longer text here and test how much it compresses
