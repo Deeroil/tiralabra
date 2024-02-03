@@ -1,7 +1,8 @@
 # Testausdokumentti
 
 Yksikkötestauksen kattavuusraportti:
-* LWZ-algoritmia on kooda
+* https://app.codecov.io/gh/Deeroil/tiralabra
+* Huffman.py ei ole testattu vielä ollenkaan, joten coverage on vain 63%
 
 Mitä on testattu, miten tämä tehtiin
 * LWZ-algoritmissa on testattu merkkijonosyötteen pakkaamisen sekä purkamisen onnistumista erikseen sekä testaamalla onko lopputulos sama kuin alunperin oli.
