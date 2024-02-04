@@ -28,8 +28,6 @@ class HuffmanTree:
 
     def __init__(self, data):
         self.minheap = []
-        self.data = data
-
         self.root = None
         self.nodes = []
 
@@ -40,6 +38,11 @@ class HuffmanTree:
 
         while len(self.minheap) > 1:
             self.merge()
+
+        items = []
+        print("root freq", self.root.frequency)
+        self.traverse(self.root, items)
+        print("items", items)
 
     def merge(self):
         """
@@ -53,13 +56,41 @@ class HuffmanTree:
         node_a = Node(a[0], a[1])
         node_b = Node(b[0], b[1])
 
-        heapq.heappush(self.minheap, (a[0] + b[0], a[1] + b[1]))
+        left = node_a
+        right = node_b
 
-        node_n = Node(a[0] + b[0], None, node_a, node_b)
+        if isinstance(a[1], Node):
+            left = a[1]
+
+        if isinstance(b[1], Node):
+            right = b[1]
+
+        node_n = Node(a[0] + b[0], None, left, right)
+        heapq.heappush(self.minheap, (a[0] + b[0], node_n))
+
+        # print("node n:", node_n.frequency, node_n)
+        # print("node n: left_freq", node_n.left.frequency)
+        # print("node n: right_freq", node_n.right.frequency)
+
         self.nodes.append(node_n)
 
         if len(self.minheap) == 1:
             self.root = node_n
+
+    def traverse(self, node, items):
+        if not node:
+            return
+        # print("traverse node:", node.frequency)
+        self.traverse(node.left, items)
+        items.append((node.frequency, node.character))
+        self.traverse(node.right, items)
+
+    def __len__(self):
+        items = []
+        self.traverse(self.root, items)
+        # print(items)
+        return len(items)
+
 
 class Huffman:
     """
