@@ -2,7 +2,7 @@
 
 Yksikkötestauksen kattavuusraportti:
 * https://app.codecov.io/gh/Deeroil/tiralabra
-* Huffman.py ei ole testattu vielä ollenkaan, joten coverage on vain 63%
+* Huffman.py:sta on testattu vain osa.
 
 Mitä on testattu, miten tämä tehtiin
 * LWZ-algoritmissa on testattu merkkijonosyötteen pakkaamisen sekä purkamisen onnistumista erikseen sekä testaamalla onko lopputulos sama kuin alunperin oli.
@@ -10,10 +10,10 @@ Mitä on testattu, miten tämä tehtiin
 * Huffman-koodausta ei ole vielä testattu muuten kuin käsin yksittäisillä syötteillä
 
 Minkälaisilla syötteillä testaus tehtiin
-*LWZ: ASCII-merkkejä sisältävillä erilaisilla syötteillä, mm. loremipsum-generaattorilla tuotettua tekstiä.
+* LWZ: ASCII-merkkejä sisältävillä erilaisilla syötteillä, mm. loremipsum-generaattorilla tuotettua tekstiä.
 
 Miten testit voidaan toistaa
-* suoritatmalla pytest-testit (tarkemmat ohjeet myöhemmin)
+* suorittamalla pytest-testit (tarkemmat ohjeet myöhemmin)
 
 Ohjelman toiminnan mahdollisen empiirisen testauksen tulosten esittäminen graafisessa muodossa
 * (toteutus myöhemmin)
