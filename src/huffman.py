@@ -136,11 +136,20 @@ class Huffman:
 
         print("root", tree.root.frequency)
 
-        # TODO: muuta nää binääritiedostoksi
         compressed = ""
         for i in data:
-            print(tree.codes[i], "and", i)
+            # print(tree.codes[i], "and", i)
             compressed += tree.codes[i]
+
+        binary_data = int(compressed, 2)
+        print(binary_data)
+        bytes_data = binary_data.to_bytes(
+            (binary_data.bit_length() + 7) // 8, byteorder="big"
+        )
+
+        print(bytes_data)
+        with open("./src/compressed_huffman.bin", "wb") as f:
+            f.write(bytes_data)
 
         return compressed
 
