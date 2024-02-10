@@ -20,16 +20,21 @@ class Node:
         self.right = right
 
 
+array = []
+
+
 class HuffmanTree:
     """
     Huffman-puun luominen Huffman algoritmin soveltamiseen.
-    Vielä kovin kesken.
+
+    Parametrit: data, lista tupleja.
     """
 
-    def __init__(self, data):
+    def __init__(self, data: list):
         self.minheap = []
         self.root = None
         self.nodes = []
+        self.codes = {}
 
         for i in data:
             heapq.heappush(self.minheap, i)
@@ -39,10 +44,10 @@ class HuffmanTree:
         while len(self.minheap) > 1:
             self.merge()
 
-        items = []
-        print("root freq", self.root.frequency)
-        self.traverse(self.root, items)
-        print("items", items)
+        # print("root freq", self.root.frequency)
+        # self.printCodes(self.root, "")
+        self.find_codes(self.root, "")
+        print("codes", self.codes)
 
     def merge(self):
         """
@@ -77,7 +82,29 @@ class HuffmanTree:
         if len(self.minheap) == 1:
             self.root = node_n
 
-    def traverse(self, node, items):
+    def find_codes(self, node: Node, code: str):
+        """
+        Etsii polun lehtisolmuihin ja tallentaa ne self.codes -sanakirjaan.
+
+        Parametrit:
+            node: juurisolmu
+            code: merkkijono johon kasataan polkuja
+        """
+        if not node:
+            return
+        if node.character is not None:
+            self.codes[node.character] = code
+        self.find_codes(node.left, code + "0")
+        self.find_codes(node.right, code + "1")
+
+    def traverse(self, node: Node, items: list):
+        """
+        Käy läpi solmut ja täyttää annetun listan niillä.
+
+        Parametrit:
+            node: juurisolmu tai käsiteltävä solmu
+            items: aluksi tyhjä lista
+        """
         if not node:
             return
         # print("traverse node:", node.frequency)
@@ -95,12 +122,12 @@ class HuffmanTree:
 class Huffman:
     """
     Huffman-koodilla pakkaaminen ja purkaminen.
-    Vielä erittäin kesken
+    Vielä erittäin kesken, ei osaa vielä kompressoida
     """
 
     def compression(self, data: str):
         """
-        Huffman-koodaus, kompressio. WIP
+        Huffman-koodaus, kompressio. WIP.
 
         Parametri: merkkijonomuodossa oleva kompressoitava data
         """
@@ -109,8 +136,13 @@ class Huffman:
 
         print("root", tree.root.frequency)
 
-        # TODO: assign binary values to letters
-        #         - traverse to leaf, save path of L/R w/ 1 and 0?
+        # TODO: muuta nää binääritiedostoksi
+        compressed = ""
+        for i in data:
+            print(tree.codes[i], "and", i)
+            compressed += tree.codes[i]
+
+        return compressed
 
     def create_frequencylist(self, data: str):
         """
