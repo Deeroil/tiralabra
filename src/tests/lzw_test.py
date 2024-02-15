@@ -8,20 +8,17 @@ banana_compressed = [98, 97, 110, 257, 97, 95, 256, 110, 100, 259]
 kokkola_string = "kokkola kokakola koko kokko lakko"
 kokkola_compressed = [107, 111, 107, 256, 108, 97, 32, 256, 107, 97, 259, 261, 263, 111, 262, 257, 256, 32, 260, 258, 111]
 
-with open("./src/tests/loremipsum.txt") as f:
+with open("./src/tests/files/loremipsum.txt") as f:
     lorem_ipsum = f.read()
 
-with open("./src/tests/lorem_longer.txt") as f:
+with open("./src/tests/files/lorem_longer.txt") as f:
     lorem_longer = f.read()
 
-with open("./src/tests/loremlorem.txt") as f:
+with open("./src/tests/files/loremlorem.txt") as f:
     loremlorem = f.read()
 
-with open("./src/tests/customers-100.txt") as f:
+with open("./src/tests/files/customers-100.txt") as f:
     customers100 = f.read()
-
-def utf8len(s):
-        return len(s.encode('utf-8'))
 
 class TestLZW(unittest.TestCase):
     def setUp(self):
