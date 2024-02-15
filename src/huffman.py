@@ -1,5 +1,6 @@
 import heapq
 import pickle
+import sys
 
 
 class Node:
@@ -168,17 +169,21 @@ class Huffman:
         # print("\nbytes", bytes_data)
         return (bytes_data, tree)
 
-    def compress_to_file(self, data: str):
+    def compress_to_file(self, data: str, filename: str):
         output = self.compression(data)
 
         bytes_compr = output[0]
         tree = output[1]
 
-        with open("./src/compressed_huffman.bin", "wb") as f:
+        print("whole tree", sys.getsizeof(tree))
+
+        with open(f"./{filename}_huffman.bin", "wb") as f:
             f.write(bytes_compr)
 
-        with open("hufftree.pkl", "wb") as f:
-            pickle.dump(tree, f)
+        print("tree", sys.getsizeof((tree.root, tree.nodes)))
+
+        with open(f"{filename}_hufftree.pkl", "wb") as f:
+            pickle.dump((tree.root, tree.nodes), f)
 
         # print("compr", bytes_compr)
         return True
@@ -230,17 +235,33 @@ class Huffman:
             output_str += i
         return output_str
 
-    # TODO: give file name as a parameter
-    def decompress_from_file(self):
-        # with open(f"{compr_file}", "rb") as f:
-        with open("./src/compressed_huffman.bin", "rb") as f:
-            compr = f.read()
+    def decompress_from_file(self, filename):
 
-        # with open(f"{tree_file}", "rb") as f:
-        with open("hufftree.pkl", "rb") as f:
+        with open(f"./{filename}_huffman.bin", "rb") as f:
+            # with open("./src/compressed_huffman.bin", "rb") as f:
+            compressed = f.read()
+
+        with open(f"./{filename}_hufftree.pkl", "rb") as f:
+            # with open("hufftree.pkl", "rb") as f:
             tree = pickle.load(f)
 
-        compressed = (compr, tree)
+        print("tree", sys.getsizeof(tree))
+        huff = HuffmanTree([(0, 0)])
+        root = tree[0]
 
-        decompressed = self.decompression(compressed)
-        return decompressed
+        bytes_data = compressed
+        binary = bin(int.from_bytes(bytes_data, byteorder="big"))
+        binary = binary[3:]
+
+        path = []
+        for i in binary:
+            path.append(i)
+
+        output = []
+        while len(path) > 0:
+            huff.decode(root, path, output)
+
+        output_str = ""
+        for i in output:
+            output_str += i
+        return output_str
