@@ -1,4 +1,5 @@
 import heapq
+import pickle
 
 
 class Node:
@@ -156,7 +157,7 @@ class Huffman:
         for i in data:
             compressed += tree.codes[i]
 
-        # quick hack to keep the leading zeros while converting to int
+        # keep the leading zeros while converting to int
         compressed = "1" + compressed
 
         binary_data = int(compressed, 2)
@@ -164,7 +165,23 @@ class Huffman:
             (binary_data.bit_length() + 7) // 8, byteorder="big"
         )
 
+        # print("\nbytes", bytes_data)
         return (bytes_data, tree)
+
+    def compress_to_file(self, data: str):
+        output = self.compression(data)
+
+        bytes_compr = output[0]
+        tree = output[1]
+
+        with open("./src/compressed_huffman.bin", "wb") as f:
+            f.write(bytes_compr)
+
+        with open("hufftree.pkl", "wb") as f:
+            pickle.dump(tree, f)
+
+        # print("compr", bytes_compr)
+        return True
 
     def create_frequencylist(self, data: str):
         """
@@ -212,3 +229,18 @@ class Huffman:
         for i in output:
             output_str += i
         return output_str
+
+    # TODO: give file name as a parameter
+    def decompress_from_file(self):
+        # with open(f"{compr_file}", "rb") as f:
+        with open("./src/compressed_huffman.bin", "rb") as f:
+            compr = f.read()
+
+        # with open(f"{tree_file}", "rb") as f:
+        with open("hufftree.pkl", "rb") as f:
+            tree = pickle.load(f)
+
+        compressed = (compr, tree)
+
+        decompressed = self.decompression(compressed)
+        return decompressed
