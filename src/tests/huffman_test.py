@@ -2,33 +2,7 @@ import unittest
 from ..huffman import Huffman, HuffmanTree
 
 banana_string = "banana_bandana"
-banana_compressed = [98, 97, 110, 257, 97, 95, 256, 110, 100, 259]
-
 kokkola_string = "kokkola kokakola koko kokko lakko"
-kokkola_compressed = [
-    107,
-    111,
-    107,
-    256,
-    108,
-    97,
-    32,
-    256,
-    107,
-    97,
-    259,
-    261,
-    263,
-    111,
-    262,
-    257,
-    256,
-    32,
-    260,
-    258,
-    111,
-]
-
 
 # https://www.youtube.com/watch?v=0kNXhFIEd_w
 example_freqlist = [(9, "b"), (5, "a"), (12, "c"), (13, "d"), (16, "e"), (45, "f")]
@@ -38,6 +12,18 @@ example_codes = {"f": "0", "c": "100", "d": "101", "a": "1100", "b": "1101", "e"
 hw_str = "Hello world!"
 hw_freqlist = []
 hw_codes = {}
+
+with open("./src/tests/files/lipsum500B.txt") as f:
+    lorem_ipsum = f.read()
+
+with open("./src/tests/files/lorem_longer.txt") as f:
+    lorem_longer = f.read()
+
+with open("./src/tests/files/loremlorem.txt") as f:
+    loremlorem = f.read()
+
+with open("./src/tests/files/customers-100.txt") as f:
+    customers100 = f.read()
 
 
 class TestHuffman(unittest.TestCase):
@@ -66,3 +52,24 @@ class TestHuffman(unittest.TestCase):
 
     def test_huffmantree_codes_are_right(self):
         self.assertEqual(self.hufftree.codes, example_codes)
+    
+    def test_huffman_lipsum500B_decompresses_right(self):
+        compr = self.huffman.compression(lorem_ipsum)
+        decompr = self.huffman.decompression(compr)
+        self.assertEqual(lorem_ipsum, decompr)
+
+    def test_huffman_customers_decompresses_right(self):
+        compr = self.huffman.compression(customers100)
+        decompr = self.huffman.decompression(compr)
+        self.assertEqual(customers100, decompr)
+
+    def test_huffman_loremlorem_decompresses_right(self):
+        compr = self.huffman.compression(loremlorem)
+        decompr = self.huffman.decompression(compr)
+        self.assertEqual(loremlorem, decompr)
+    
+    def test_huffman_lorem_longer_decompresses_right(self):
+        compr = self.huffman.compression(lorem_longer)
+        decompr = self.huffman.decompression(compr)
+        self.assertEqual(lorem_longer, decompr)
+

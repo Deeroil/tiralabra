@@ -1,12 +1,5 @@
 import heapq
 
-## TODO:
-##    - huffman tree: traversing and adding binary values
-##    - check if the tree works :D
-##    - save as a binary file
-##    - decompression to string
-##    - add tests
-
 
 class Node:
     """
@@ -19,8 +12,14 @@ class Node:
         self.left = left
         self.right = right
 
+    def __lt__(self, obj):
+        if not isinstance(obj, Node):
+            return True
+        else:
+            return False
 
-array = []
+    def __gt__(self, obj):
+        return not self.__lt__(obj)
 
 
 class HuffmanTree:
@@ -44,8 +43,6 @@ class HuffmanTree:
         while len(self.minheap) > 1:
             self.merge()
 
-        # print("root freq", self.root.frequency)
-        # self.printCodes(self.root, "")
         self.find_codes(self.root, "")
         print("codes", self.codes)
 
@@ -58,11 +55,8 @@ class HuffmanTree:
 
         a = heapq.heappop(self.minheap)
         b = heapq.heappop(self.minheap)
-        node_a = Node(a[0], a[1])
-        node_b = Node(b[0], b[1])
-
-        left = node_a
-        right = node_b
+        left = Node(a[0], a[1])
+        right = Node(b[0], b[1])
 
         if isinstance(a[1], Node):
             left = a[1]
@@ -72,10 +66,6 @@ class HuffmanTree:
 
         node_n = Node(a[0] + b[0], None, left, right)
         heapq.heappush(self.minheap, (a[0] + b[0], node_n))
-
-        # print("node n:", node_n.frequency, node_n)
-        # print("node n: left_freq", node_n.left.frequency)
-        # print("node n: right_freq", node_n.right.frequency)
 
         self.nodes.append(node_n)
 
@@ -112,6 +102,32 @@ class HuffmanTree:
         items.append((node.frequency, node.character))
         self.traverse(node.right, items)
 
+    def decode(self, node: Node, path: list, output: list):
+        """
+        Käy läpi solmut annetussa järjestyksessä ja tallentaa saadun merkkijonon
+
+        Parametrit:
+            node: juurisolmu tai käsiteltävä solmu
+            path: binääriesitys koodeista
+            output: lopullinen tulos
+        """
+
+        if not node:
+            return
+
+        if node.character is not None:
+            output.append(node.character)
+            return
+
+        if path[0] == "0":
+            path.pop(0)
+            self.decode(node.left, path, output)
+        elif path[0] == "1":
+            path.pop(0)
+            self.decode(node.right, path, output)
+        else:
+            print("path[0]", path[0])
+
     def __len__(self):
         items = []
         self.traverse(self.root, items)
@@ -125,6 +141,7 @@ class Huffman:
     Vielä erittäin kesken, ei osaa vielä kompressoida
     """
 
+    # TODO: erottele (de)compression ja (de)compress to file
     def compression(self, data: str):
         """
         Huffman-koodaus, kompressio. WIP.
@@ -133,25 +150,21 @@ class Huffman:
         """
         datalist = self.create_frequencylist(data)
         tree = HuffmanTree(datalist)
-
-        print("root", tree.root.frequency)
+        # print("root", tree.root.frequency)
 
         compressed = ""
         for i in data:
-            # print(tree.codes[i], "and", i)
             compressed += tree.codes[i]
 
+        # quick hack to keep the leading zeros while converting to int
+        compressed = "1" + compressed
+
         binary_data = int(compressed, 2)
-        print(binary_data)
         bytes_data = binary_data.to_bytes(
             (binary_data.bit_length() + 7) // 8, byteorder="big"
         )
 
-        print(bytes_data)
-        with open("./src/compressed_huffman.bin", "wb") as f:
-            f.write(bytes_data)
-
-        return compressed
+        return (bytes_data, tree)
 
     def create_frequencylist(self, data: str):
         """
@@ -181,12 +194,21 @@ class Huffman:
         return tuple_list
 
     def decompression(self, compressed):
-        pass
+        bytes_data = compressed[0]
+        tree = compressed[1]
+        binary = bin(int.from_bytes(bytes_data, byteorder="big"))
+        binary = binary[3:]
+        # print("bin", binary)
 
+        path = []
+        for i in binary:
+            path.append(i)
 
-if __name__ == "__main__":
-    example_data = [(9, "b"), (5, "a"), (12, "c"), (13, "d"), (16, "e"), (45, "f")]
-    example_str = "bfbbfafdddfbcccffefcccffdddddbfffecfffacfbbfaafcfefafccfffcfefffdddfffefffddffffeffffbbfeeeeeeeeeeff"
+        output = []
+        while len(path) > 0:
+            tree.decode(tree.root, path, output)
 
-    huffman = Huffman()
-    huffman.compression(example_str)
+        output_str = ""
+        for i in output:
+            output_str += i
+        return output_str
