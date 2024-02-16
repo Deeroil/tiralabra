@@ -182,10 +182,12 @@ class Huffman:
 
         print("tree", sys.getsizeof((tree.root, tree.nodes)))
 
-        with open(f"{filename}_hufftree.pkl", "wb") as f:
-            pickle.dump((tree.root, tree.nodes), f)
+        # with open(f"{filename}_hufftree.pkl", "wb") as f:
+        #     pickle.dump((tree.root, tree.nodes), f)
 
-        # print("compr", bytes_compr)
+        with open(f"{filename}_hufftree.pkl", "wb") as f:
+            pickle.dump(tree.root, f)
+
         return True
 
     def create_frequencylist(self, data: str):
@@ -238,17 +240,15 @@ class Huffman:
     def decompress_from_file(self, filename):
 
         with open(f"./{filename}_huffman.bin", "rb") as f:
-            # with open("./src/compressed_huffman.bin", "rb") as f:
             compressed = f.read()
 
+        # with open(f"./{filename}_hufftree.pkl", "rb") as f:
+        #     tree = pickle.load(f)
+
         with open(f"./{filename}_hufftree.pkl", "rb") as f:
-            # with open("hufftree.pkl", "rb") as f:
-            tree = pickle.load(f)
+            root = pickle.load(f)
 
-        print("tree", sys.getsizeof(tree))
         huff = HuffmanTree([(0, 0)])
-        root = tree[0]
-
         bytes_data = compressed
         binary = bin(int.from_bytes(bytes_data, byteorder="big"))
         binary = binary[3:]
