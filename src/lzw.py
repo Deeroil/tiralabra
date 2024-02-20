@@ -1,3 +1,6 @@
+import pickle
+
+
 class LZW:
     """
     Toteuttaa Lempel-Ziv-Welch pakkausalgoritmin,
@@ -26,6 +29,7 @@ class LZW:
         Palauttaa: [98, 97, 110, 257, 97, 95, 256, 110, 100, 259]
         """
 
+        print("compressing...")
         string_table = [chr(i) for i in range(256)]
         output_file = []
         index = 0
@@ -40,9 +44,16 @@ class LZW:
                 string_table.append(s + ch)
                 s = ch
             index += 1
+            # print(index, "<", len(decompressed), ":", s)
 
         output_file.append(string_table.index(s))
-        print(output_file)
+
+        filename = "holmes"
+        with open(f"compressed_{filename}_lwz.pkl", "wb") as f:
+            pickle.dump(output_file, f)
+
+        print("out noniinh")
+        # print("out", output_file)
         return output_file
 
     def decompression(self, compressed: list):
@@ -57,6 +68,7 @@ class LZW:
         Palauttaa: "banana_bandana"
         """
 
+        print("decompressing...")
         output_file = []
         string_table = [chr(i) for i in range(256)]
         entry = ""
@@ -81,9 +93,23 @@ class LZW:
             prevcode = currcode
 
             index += 1
+            # print(index, entry)
 
         decompressed = ""
         for i in compressed:
             decompressed += string_table[i]
 
         return decompressed
+
+    def decompress_from_file(self):
+        filename = "holmes"
+        with open(f"compressed_{filename}_lwz.pkl", "rb") as f:
+            output = pickle.load(f)
+
+        a = self.decompression(output)
+        # print("aaaA:", a)
+        print("Yay done")
+        # print("a", a)
+
+        with open(f"decompressed_{filename}_lwz.pkl", "w") as f:
+            f.write(a)
