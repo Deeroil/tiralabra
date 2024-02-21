@@ -17,3 +17,5 @@ Huffman-koodauksen ja LZW-pakkausalgoritmin vertailu
 [viikkoraportti 4](./documentation//Viikkoraportti4.md)
 
 [viikkoraportti 5](./documentation//Viikkoraportti5.md)
+
+[viikkoraportti 6](./documentation//Viikkoraportti6.md)
