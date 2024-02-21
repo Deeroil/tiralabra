@@ -30,30 +30,31 @@ class LZW:
         """
 
         print("compressing...")
-        string_table = [chr(i) for i in range(256)]
+        decomp_len = len(decompressed)
+        string_table = {}
+        for i in range(256):
+            string_table[chr(i)] = i
         output_file = []
         index = 0
         s = ""
 
-        while index < len(decompressed):
+        while index < decomp_len:
             ch = decompressed[index]
             if s + ch in string_table:
                 s = s + ch
             else:
-                output_file.append(string_table.index(s))
-                string_table.append(s + ch)
+                output_file.append(string_table[s])
+                string_table[s + ch] = len(string_table)
                 s = ch
             index += 1
-            # print(index, "<", len(decompressed), ":", s)
 
-        output_file.append(string_table.index(s))
+        output_file.append(string_table[s])
 
-        filename = "holmes"
+        filename = "dict_loremlorem4MB"
         with open(f"compressed_{filename}_lwz.pkl", "wb") as f:
             pickle.dump(output_file, f)
 
-        print("out noniinh")
-        # print("out", output_file)
+        print("compr valmis")
         return output_file
 
     def decompression(self, compressed: list):
@@ -70,7 +71,16 @@ class LZW:
 
         print("decompressing...")
         output_file = []
-        string_table = [chr(i) for i in range(256)]
+        compr_len = len(compressed)
+
+        string_table = {}
+        for i in range(256):
+            string_table[chr(i)] = i
+
+        index_table = {}
+        for i in range(256):
+            index_table[i] = chr(i)
+
         entry = ""
         ch = ""
         prevcode = compressed[0]
@@ -78,26 +88,28 @@ class LZW:
         c = ""
 
         index = 1
-        while index < len(compressed):
+        while index < compr_len:
             currcode = compressed[index]
-            if len(string_table) - 1 < currcode:
-                s = string_table[prevcode]
+            if len(index_table) - 1 < currcode:
+                s = index_table[prevcode]
                 s = s + c
             else:
-                s = string_table[currcode]
+                s = index_table[currcode]
 
             entry = s
             output_file.append(entry)
             ch = entry[0]
-            string_table.append(string_table[prevcode] + ch)
+
+            stringtable_len = len(string_table)
+            string_table[index_table[prevcode] + ch] = stringtable_len
+            index_table[stringtable_len] = index_table[prevcode] + ch
             prevcode = currcode
 
             index += 1
-            # print(index, entry)
 
         decompressed = ""
         for i in compressed:
-            decompressed += string_table[i]
+            decompressed += index_table[i]
 
         return decompressed
 
@@ -107,9 +119,8 @@ class LZW:
             output = pickle.load(f)
 
         a = self.decompression(output)
-        # print("aaaA:", a)
         print("Yay done")
-        # print("a", a)
 
         with open(f"decompressed_{filename}_lwz.pkl", "w") as f:
             f.write(a)
+        return a
