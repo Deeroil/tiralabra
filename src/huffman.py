@@ -34,19 +34,16 @@ class HuffmanTree:
     def __init__(self, data: list):
         self.minheap = []
         self.root = None
-        self.nodes = []
         self.codes = {}
 
         for i in data:
             heapq.heappush(self.minheap, i)
-            node = Node(i[0], i[1], None, None)
-            self.nodes.append(node)
 
         while len(self.minheap) > 1:
             self.merge()
 
         self.find_codes(self.root, "")
-        print("codes", self.codes)
+        # print("codes", self.codes)
 
     def merge(self):
         """
@@ -68,8 +65,6 @@ class HuffmanTree:
 
         node_n = Node(a[0] + b[0], None, left, right)
         heapq.heappush(self.minheap, (a[0] + b[0], node_n))
-
-        self.nodes.append(node_n)
 
         if len(self.minheap) == 1:
             self.root = node_n
@@ -121,11 +116,14 @@ class HuffmanTree:
             output.append(node.character)
             return
 
-        if path[0] == "0":
-            path.pop(0)
+        if len(path) == 0:
+            return
+
+        if path[-1] == "0":
+            path.pop()
             self.decode(node.left, path, output)
-        elif path[0] == "1":
-            path.pop(0)
+        elif path[-1] == "1":
+            path.pop()
             self.decode(node.right, path, output)
         else:
             print("path[0]", path[0])
@@ -175,15 +173,8 @@ class Huffman:
         bytes_compr = output[0]
         tree = output[1]
 
-        print("whole tree", sys.getsizeof(tree))
-
         with open(f"./{filename}_huffman.bin", "wb") as f:
             f.write(bytes_compr)
-
-        print("tree", sys.getsizeof((tree.root, tree.nodes)))
-
-        # with open(f"{filename}_hufftree.pkl", "wb") as f:
-        #     pickle.dump((tree.root, tree.nodes), f)
 
         with open(f"{filename}_hufftree.pkl", "wb") as f:
             pickle.dump(tree.root, f)
@@ -228,10 +219,13 @@ class Huffman:
         for i in binary:
             path.append(i)
 
+        path.reverse()
+
         output = []
         while len(path) > 0:
             tree.decode(tree.root, path, output)
 
+        print("decoded")
         output_str = ""
         for i in output:
             output_str += i
@@ -241,9 +235,6 @@ class Huffman:
 
         with open(f"./{filename}_huffman.bin", "rb") as f:
             compressed = f.read()
-
-        # with open(f"./{filename}_hufftree.pkl", "rb") as f:
-        #     tree = pickle.load(f)
 
         with open(f"./{filename}_hufftree.pkl", "rb") as f:
             root = pickle.load(f)
@@ -257,9 +248,13 @@ class Huffman:
         for i in binary:
             path.append(i)
 
+        path.reverse()
+
         output = []
+        print("gonna decode")
         while len(path) > 0:
             huff.decode(root, path, output)
+        print("decoded")
 
         output_str = ""
         for i in output:
