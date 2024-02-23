@@ -1,6 +1,4 @@
 import heapq
-import pickle
-import sys
 
 
 class Node:
@@ -94,7 +92,7 @@ class HuffmanTree:
         """
         if not node:
             return
-        # print("traverse node:", node.frequency)
+
         self.traverse(node.left, items)
         items.append((node.frequency, node.character))
         self.traverse(node.right, items)
@@ -128,10 +126,33 @@ class HuffmanTree:
         else:
             print("path[0]", path[0])
 
+    def store_tree(self, node: Node, output: list):
+        """
+        Varastoi huffmanpuun listaksi.
+
+        Parametrit:
+            node: juurisolmu tai käsiteltävä solmu
+            output: lista johon tallennetaan solmuja kuvaavat bitit
+
+        Mukailee C#-pseudokoodia täältä:
+        https://stackoverflow.com/questions/759707/efficient-way-of-storing-huffman-tree
+        """
+        if not node:
+            return
+
+        if node.character is not None:
+            charnum = ord(node.character)
+            binary = bin(charnum)[2:].zfill(8)
+            output.append("1" + binary)
+
+        else:
+            output.append("0")
+            self.store_tree(node.left, output)
+            self.store_tree(node.right, output)
+
     def __len__(self):
         items = []
         self.traverse(self.root, items)
-        # print(items)
         return len(items)
 
 
@@ -141,7 +162,29 @@ class Huffman:
     Vielä erittäin kesken, ei osaa vielä kompressoida
     """
 
-    # TODO: erottele (de)compression ja (de)compress to file
+    def bytes_helper(self, data: str):
+        """
+        Muuntaa merkkijonoesityksen binääristä tavuiksi.
+        Huom. lisää annetun binäärin alkuun luvun 1, jotta alussa
+        olevat 0-bitit eivät katoa.
+
+        Parametri: merkkijonoesitys binääristä
+
+        Palauttaa: tavun
+
+        esimerkki:
+        Parametri: "001"
+        Palauttaa: tavun, joka kuvastaa binäärilukua "1001"
+        """
+
+        # print("data", data)
+        data = "1" + data
+        binary_data = int(data, 2)
+        bytes_data = binary_data.to_bytes(
+            (binary_data.bit_length() + 7) // 8, byteorder="big"
+        )
+        return bytes_data
+
     def compression(self, data: str):
         """
         Huffman-koodaus, kompressio. WIP.
@@ -150,21 +193,12 @@ class Huffman:
         """
         datalist = self.create_frequencylist(data)
         tree = HuffmanTree(datalist)
-        # print("root", tree.root.frequency)
 
         compressed = ""
         for i in data:
             compressed += tree.codes[i]
 
-        # keep the leading zeros while converting to int
-        compressed = "1" + compressed
-
-        binary_data = int(compressed, 2)
-        bytes_data = binary_data.to_bytes(
-            (binary_data.bit_length() + 7) // 8, byteorder="big"
-        )
-
-        # print("\nbytes", bytes_data)
+        bytes_data = self.bytes_helper(compressed)
         return (bytes_data, tree)
 
     def compress_to_file(self, data: str, filename: str):
@@ -173,11 +207,20 @@ class Huffman:
         bytes_compr = output[0]
         tree = output[1]
 
+        stored_tree = []
+        tree.store_tree(tree.root, stored_tree)
+
+        string_tree = ""
+        for i in stored_tree:
+            string_tree = string_tree + i
+
+        tree_bytes = self.bytes_helper(string_tree)
+
         with open(f"./{filename}_huffman.bin", "wb") as f:
             f.write(bytes_compr)
 
-        with open(f"{filename}_hufftree.pkl", "wb") as f:
-            pickle.dump(tree.root, f)
+        with open(f"{filename}_hufftree_compr.bin", "wb") as f:
+            f.write(tree_bytes)
 
         return True
 
@@ -208,18 +251,39 @@ class Huffman:
             tuple_list.append((data_frequencies[i], characters[i]))
         return tuple_list
 
+    def open_stored_tree(self, treelist: list):
+        """
+        Purkaa huffman-puuta kuvaavan yksinkertaistetun puun listasta.
+        Huom: lista on käännetty väärinpäin ja käsitellään lopusta alkaen.
+
+        Parametrit:
+            treelist: käännetty lista kaikista puussa käsiteltävistä biteistä.
+                esim. ["0", "1", "1", ..., "0"]
+
+        Mukailee C#-pseudokoodia täältä, tosin lista on käännetty ja mukautukset siihen liittyen
+        https://stackoverflow.com/questions/759707/efficient-way-of-storing-huffman-tree
+        """
+        if treelist[-1] == "1":
+            treelist.pop()
+
+            byte = ""
+            for _ in range(8):
+                byte = byte + treelist.pop()
+            char = chr(int(byte, 2))
+
+            return Node(None, char)
+        elif treelist[-1] == "0":
+            treelist.pop()
+
+            left = self.open_stored_tree(treelist)
+            right = self.open_stored_tree(treelist)
+
+            return Node(0, None, left, right)
+
     def decompression(self, compressed):
         bytes_data = compressed[0]
         tree = compressed[1]
-        binary = bin(int.from_bytes(bytes_data, byteorder="big"))
-        binary = binary[3:]
-        # print("bin", binary)
-
-        path = []
-        for i in binary:
-            path.append(i)
-
-        path.reverse()
+        path = self.bytes_to_reversed_list_helper(bytes_data)
 
         output = []
         while len(path) > 0:
@@ -231,24 +295,28 @@ class Huffman:
             output_str += i
         return output_str
 
-    def decompress_from_file(self, filename):
+    def bytes_to_reversed_list_helper(self, data):
+        binary = bin(int.from_bytes(data, byteorder="big"))
+        binary = binary[3:]
 
+        binlist = []
+        for i in binary:
+            binlist.append(i)
+        binlist.reverse()
+        return binlist
+
+    def decompress_from_file(self, filename):
         with open(f"./{filename}_huffman.bin", "rb") as f:
             compressed = f.read()
 
-        with open(f"./{filename}_hufftree.pkl", "rb") as f:
-            root = pickle.load(f)
+        with open(f"./{filename}_hufftree_compr.bin", "rb") as f:
+            tree_from_file = f.read()
 
         huff = HuffmanTree([(0, 0)])
-        bytes_data = compressed
-        binary = bin(int.from_bytes(bytes_data, byteorder="big"))
-        binary = binary[3:]
+        path = self.bytes_to_reversed_list_helper(compressed)
 
-        path = []
-        for i in binary:
-            path.append(i)
-
-        path.reverse()
+        treelist = self.bytes_to_reversed_list_helper(tree_from_file)
+        root = self.open_stored_tree(treelist)
 
         output = []
         print("gonna decode")
