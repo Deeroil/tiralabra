@@ -1,6 +1,6 @@
 # Viikkoraportti 6
 
-Tuntimäärä: 6
+Tuntimäärä: 9
 
 Toteutin LWZ:lle tiedostoon tallentamista. Jostain syystä kerran kun yritin vain purkaa tiedoston valmiiksi kompressoidusta tiedostosta, oli saadun tiedoston sisältö täysin eri kuin tarkoitettu tiedosto.
 En saanut toistettua ongelmaa.
@@ -11,4 +11,6 @@ Huffman-algoritmin nopeutus tapahtui kääntämällä yksi lista väärinpäin j
 
 Pakkaaminen ja purkaminen sujuu nyt reilusti nopeammin molemmilla algoritmeilla.
 
-Huffman-puun tallentamisen tutkimista jotat tallentuisi vähempään tilaan, yritän saada tehtyä sen vielä viikon 6 aikana.
+Huffman-puun tallentaminen pienempään tilaan on myös toteutettu, ja suorituskykymittauksia kirjoitetaan.
+
+Ensi viikolla aion viimeistellä dokumentaatiota ja mitata suorituskykyä paremmin.
