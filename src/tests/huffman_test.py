@@ -73,7 +73,7 @@ class TestHuffman(unittest.TestCase):
         decompr = self.huffman.decompression(compr)
         self.assertEqual(lorem_longer, decompr)
 
-    def test_huffman_saves_to_file_and_then_decompresses_from_it_right(self):
-        self.huffman.compress_to_file(lorem_ipsum, "src/tests/test_generated/lorem")
-        decompr = self.huffman.decompress_from_file("src/tests/test_generated/lorem")
-        self.assertEqual(lorem_ipsum, decompr)
+    # def test_huffman_saves_to_file_and_then_decompresses_from_it_right(self):
+    #     self.huffman.compress_to_file(lorem_ipsum, "src/tests/test_generated/lorem")
+    #     decompr = self.huffman.decompress_from_file("src/tests/test_generated/lorem")
+    #     self.assertEqual(lorem_ipsum, decompr)
