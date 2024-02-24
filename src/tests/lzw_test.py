@@ -70,8 +70,8 @@ class TestLZW(unittest.TestCase):
         self.assertEqual(customers100, decompr)
 
     def test_lzw_saves_to_file_and_then_decompresses_from_it_right(self):
-        self.lzw.compress_to_file(lorem_ipsum, "./src/tests/test_generated/lorem")
-        decompr = self.lzw.decompress_from_file("./src/tests/test_generated/lorem")
+        self.lzw.compress_to_file(lorem_ipsum, "src/tests/test_generated/lorem")
+        decompr = self.lzw.decompress_from_file("src/tests/test_generated/lorem")
         self.assertEqual(lorem_ipsum, decompr)
 
     # def test_book_compresses_and_decompresses(self):
