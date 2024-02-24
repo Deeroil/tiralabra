@@ -52,7 +52,7 @@ class TestHuffman(unittest.TestCase):
 
     def test_huffmantree_codes_are_right(self):
         self.assertEqual(self.hufftree.codes, example_codes)
-    
+
     def test_huffman_lipsum500B_decompresses_right(self):
         compr = self.huffman.compression(lorem_ipsum)
         decompr = self.huffman.decompression(compr)
@@ -67,9 +67,13 @@ class TestHuffman(unittest.TestCase):
         compr = self.huffman.compression(loremlorem)
         decompr = self.huffman.decompression(compr)
         self.assertEqual(loremlorem, decompr)
-    
+
     def test_huffman_lorem_longer_decompresses_right(self):
         compr = self.huffman.compression(lorem_longer)
         decompr = self.huffman.decompression(compr)
         self.assertEqual(lorem_longer, decompr)
 
+    def test_huffman_saves_to_file_and_then_decompresses_from_it_right(self):
+        self.huffman.compress_to_file(lorem_ipsum, "./src/tests/test_generated/lorem")
+        decompr = self.huffman.decompress_from_file("./src/tests/test_generated/lorem")
+        self.assertEqual(lorem_ipsum, decompr)
