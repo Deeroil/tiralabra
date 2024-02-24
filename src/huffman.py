@@ -132,7 +132,7 @@ class HuffmanTree:
 
         Parametrit:
             node: juurisolmu tai käsiteltävä solmu
-            output: lista johon tallennetaan solmuja kuvaavat bitit
+            output: lista johon tallennetaan solmuja kuvaavat bitit merkkijonoina
 
         Mukailee C#-pseudokoodia täältä:
         https://stackoverflow.com/questions/759707/efficient-way-of-storing-huffman-tree
@@ -159,7 +159,6 @@ class HuffmanTree:
 class Huffman:
     """
     Huffman-koodilla pakkaaminen ja purkaminen.
-    Vielä erittäin kesken, ei osaa vielä kompressoida
     """
 
     def bytes_helper(self, data: str):
@@ -174,7 +173,7 @@ class Huffman:
 
         esimerkki:
         Parametri: "001"
-        Palauttaa: tavun, joka kuvastaa binäärilukua "1001"
+        Palauttaa: tavuja, joka kuvastaa binäärilukua "1001"
         """
 
         # print("data", data)
@@ -187,9 +186,13 @@ class Huffman:
 
     def compression(self, data: str):
         """
-        Huffman-koodaus, kompressio. WIP.
+        Huffman-koodaus, kompressio.
 
-        Parametri: merkkijonomuodossa oleva kompressoitava data
+        Parametri:
+            data: kompressoitava data merkkijonona
+
+        Palauttaa:
+            tuple: (tavudata, huffmanpuu)
         """
         datalist = self.create_frequencylist(data)
         tree = HuffmanTree(datalist)
@@ -202,6 +205,16 @@ class Huffman:
         return (bytes_data, tree)
 
     def compress_to_file(self, data: str, filename: str):
+        """
+        Huffman-koodaus, tiedostoon kompressoiminen.
+        Tallentuu tiedostoihin
+            "filename_huffman.bin" ja
+            "filename_hufftree.bin"
+
+        parametrit:
+            data: merkkijonoesitys kompressoitavasta datasta
+            filename: tallennettavan tiedoston nimen etuosa
+        """
         output = self.compression(data)
 
         bytes_compr = output[0]
@@ -219,7 +232,7 @@ class Huffman:
         with open(f"./{filename}_huffman.bin", "wb") as f:
             f.write(bytes_compr)
 
-        with open(f"{filename}_hufftree_compr.bin", "wb") as f:
+        with open(f"{filename}_hufftree.bin", "wb") as f:
             f.write(tree_bytes)
 
         return True
@@ -281,6 +294,17 @@ class Huffman:
             return Node(0, None, left, right)
 
     def decompression(self, compressed):
+        """
+        Huffman-koodaus, purkaminen.
+
+        Parametri:
+            compressed: tuple joka sisältää kompressoidut tiedot
+                    compressed[0]: tavut
+                    compressed[1]: huffmanpuu
+
+        Palauttaa:
+            output_str: purettu tiedosto merkkijonona
+        """
         bytes_data = compressed[0]
         tree = compressed[1]
         path = self.bytes_to_reversed_list_helper(bytes_data)
@@ -296,6 +320,13 @@ class Huffman:
         return output_str
 
     def bytes_to_reversed_list_helper(self, data):
+        """
+        parametrit:
+            data: tavujono
+
+        palauttaa:
+            lista tavujonossa olevista biteistä, käänteisessä järjestyksessä
+        """
         binary = bin(int.from_bytes(data, byteorder="big"))
         binary = binary[3:]
 
@@ -306,10 +337,27 @@ class Huffman:
         return binlist
 
     def decompress_from_file(self, filename):
+        """
+        Huffman-koodaus, tiedostoista purkaminen.
+        Tallentaa tuloksen tiedostoon.
+
+        Puretaan tiedostoista
+            "filename_huffman.bin" ja
+            "filename_hufftree.bin"
+        ja tallentaa tiedostoon
+            "filename_huffman_decompr.txt"
+
+        parametrit:
+            filename: purettavan tiedoston nimen etuosa
+
+        palauttaa:
+            output_str: merkkijonoesityksen puretusta tiedostosta
+
+        """
         with open(f"./{filename}_huffman.bin", "rb") as f:
             compressed = f.read()
 
-        with open(f"./{filename}_hufftree_compr.bin", "rb") as f:
+        with open(f"./{filename}_hufftree.bin", "rb") as f:
             tree_from_file = f.read()
 
         huff = HuffmanTree([(0, 0)])
@@ -327,4 +375,7 @@ class Huffman:
         output_str = ""
         for i in output:
             output_str += i
+
+        with open(f"./{filename}_huffman_decompr.txt", "w") as f:
+            f.write(output_str)
         return output_str

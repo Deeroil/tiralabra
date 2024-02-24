@@ -5,7 +5,7 @@ class LZW:
     """
     Toteuttaa Lempel-Ziv-Welch pakkausalgoritmin,
     sekä pakkaamisen että purkamisen.
-    Toimii merkkijonoilla.
+    Toimii merkkijonoilla jotka sisältävät vain ASCII-merkkejä.
 
     Algoritmien toteuttamisessa on hyödynnetty pseudokoodia
     seuraavilta sivuilta:
@@ -50,18 +50,30 @@ class LZW:
 
         output_file.append(string_table[s])
 
-        filename = "dict_loremlorem4MB"
-        with open(f"compressed_{filename}_lwz.pkl", "wb") as f:
-            pickle.dump(output_file, f)
-
         print("compr valmis")
         return output_file
+
+    def compress_to_file(self, data: str, filename: str):
+        """
+        LZW tiedostoon kompressoiminen.
+        Tallentuu tiedostoksi "filename_compr_lwz.pkl"
+
+        parametrit:
+            data: merkkijonoesitys kompressoitavasta datasta
+            filename: tallennettavan tiedoston nimen etuosa
+        """
+        compressed = self.compression(data)
+
+        with open(f"{filename}_compr_lwz.pkl", "wb") as f:
+            pickle.dump(compressed, f)
 
     def decompression(self, compressed: list):
         """
         Lempel-Ziv-Welch dekompressioalgoritmi
 
-        Parametri: lista indeksejä, kompressoitu versio merkkijonosta
+        Parametri:
+            compressed: lista indeksejä, kompressoitu versio merkkijonosta
+
         Palauttaa: merkkijono joka saadaan purkamalla kompressio
 
         esim
@@ -113,14 +125,20 @@ class LZW:
 
         return decompressed
 
-    def decompress_from_file(self):
-        filename = "holmes"
-        with open(f"compressed_{filename}_lwz.pkl", "rb") as f:
+    def decompress_from_file(self, filename: str):
+        """
+        LZW tiedostostosta purkaminen.
+        Luetaan tiedostosta "filename_compr_lwz.pkl"
+
+        parametrit:
+            filename: purettavan tiedoston nimen etuosa
+        """
+        with open(f"{filename}_compr_lwz.pkl", "rb") as f:
             output = pickle.load(f)
 
         a = self.decompression(output)
         print("Yay done")
 
-        with open(f"decompressed_{filename}_lwz.pkl", "w") as f:
+        with open(f"./{filename}_decompr_lwz.pkl", "w") as f:
             f.write(a)
         return a
