@@ -12,46 +12,46 @@ Luonnollisella kielellä tehty vertailu:
 
 
 Dracula1  4.6 kB
-LZW:      5.6 kB    125%
+LZW:      3   kB    65%
 Huffman:  2.7 kB    60%
 
 holmes1   14.5 kB
-LZW:      15.4 kB   106%
+LZW:      8.7  kB   60%
 Huffman:  8.5  kB   58%
 
 romeojuliet   141.7 kB  
-LZW:          106.6 kB  75%
+LZW:          71.8  kB  50%
 Huffman:      85.3  kB  60%
 
 holmes2   334.1 kB  
-LZW:      213.4 kB  64%
+LZW:      151.3 kB  45%
 Huffman:  187.5 kB  56%
 
 holmes3   2.0 MB
-LZW:      1.4 MB    70%
+LZW:      830 kB    42%
 Huffman:  1.2 MB    60%
 
 holmes4   4.0 MB
-LZW:      2.8 MB    70%
+LZW:      1.6 MB    40%
 Huffman:  2.3 MB    58%
 
 holmes    6.5 MB
-LZW:      4.4 MB    67%
+LZW:      2.5 MB    38%
 Huffman:  3.7 MB    57%
 
 Lorem ipsumilla tehty vertailu
 (sisältää paljon toisteisuutta)
 
 lipsum500B 501 B
-LZW:       804 B 
+LZW:       358 B
 Huffman:   305 B 
 
 lipsum1KB  1.1 kB 
-LZW:       1.6 kB
-Huffman:   637 b
+LZW:       742 B
+Huffman:   637 B
 
 lipsum4KB   4.1 kB
-LZW:        4.8 kB
+LZW:        2.3 kB
 Huffman:    2.2 kB
 
 lipsum16KB  16.1 kB
@@ -59,11 +59,11 @@ LZW:        13.4 kB
 Huffman:    8.7 kB
 
 lipsum1MB   1.2 MB
-LZW:        524 kB
+LZW:        7.4 kB
 Huffman:    643 kB 
 
 lipsum2MB   2.4 MB
-LZW:        1.1 MB   
+LZW:        583.4 kB
 Huffman:    1.3 MB
 
 

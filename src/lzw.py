@@ -19,7 +19,7 @@ class LZW:
         Lempel-Ziv-Welch kompressioalgoritmi
 
         Ottaa vastaan: merkkijonon
-        Palauttaa: Listan indeksejä, joka on kompressoitu versio merkkijonosta
+        Palauttaa: Listan indeksejä, joka on kompressoitu versio merkkijonosta.
 
         esim.
         Parametri: "banana_bandana"
@@ -57,7 +57,10 @@ class LZW:
     def compress_to_file(self, data: str, filename: str):
         """
         LZW tiedostoon kompressoiminen.
-        Tallentuu tiedostoksi "filename__lzw_final.bin"
+        Tallentuu tiedostoksi "filename_lzw_final.bin"
+
+        Binääridatan alkuun tallennetaan lukujen maksimikoon
+        infoa 32 bittiin.
 
         parametrit:
             data: merkkijonoesitys kompressoitavasta datasta
@@ -65,11 +68,20 @@ class LZW:
         """
         compressed = self.compression(data)
 
+        biggest_number = max(compressed)
+        bitlen = biggest_number.bit_length()
+
         asia = ""
+
+        # bittien pituus tallennetaan 32-bit sisälle alkuun
+        b = bin(bitlen)[2:]
+        b = b.zfill(32)
+        asia += b
+
         for i in compressed:
             b = bin(i)[2:]
-            if len(b) < 32:
-                b = b.zfill(32)
+            if len(b) < bitlen:
+                b = b.zfill(bitlen)
             asia += b
 
         asia = "1" + asia
@@ -145,6 +157,9 @@ class LZW:
         LZW tiedostostosta purkaminen.
         Luetaan tiedostosta "filename_lzw_final.bin"
 
+        32 ensimmäistä bittiä kertoo "bitlen", jonka avulla puretaan
+        binääri-informaatio takaisin listaksi.
+
         parametrit:
             filename: purettavan tiedoston nimen etuosa
         """
@@ -159,11 +174,16 @@ class LZW:
 
         # print("TYYPPI:", type(output))
 
+        bitlen = binary[:32]
+        bitlen = int(bitlen, 2)
+        binary = binary[32:]
+        print(bitlen)
+
         lista = []
-        for i in range(0, len(binary), 32):
+        for i in range(0, len(binary), bitlen):
             luku = ""
             add = True
-            for j in range(32):
+            for j in range(bitlen):
                 if j + i < len(binary):
                     luku += binary[j + i]
                 else:
