@@ -1,5 +1,34 @@
 import pickle
+import sys
 
+# x = 7000
+x = 965120 #vika
+x = 450000
+
+
+# ei käytössäs
+def bytes_helper(data: str):
+    """
+    Muuntaa merkkijonoesityksen binääristä tavuiksi.
+    Huom. lisää annetun binäärin alkuun luvun 1, jotta alussa
+    olevat 0-bitit eivät katoa.
+
+    Parametri: merkkijonoesitys binääristä
+
+    Palauttaa: tavun
+
+    esimerkki:
+    Parametri: "001"
+    Palauttaa: tavuja, joka kuvastaa binäärilukua "1001"
+    """
+
+    # print("data", data)
+    data = "1" + data
+    binary_data = int(data, 2)
+    bytes_data = binary_data.to_bytes(
+        (binary_data.bit_length() + 7) // 8, byteorder="big"
+    )
+    return bytes_data
 
 class LZW:
     """
@@ -51,6 +80,12 @@ class LZW:
         output_file.append(string_table[s])
 
         print("compr valmis")
+
+        print("listaeka:", output_file[0])
+        print("listax:", output_file[x])
+        print("listavika:", output_file[len(output_file) -1])
+        print("len:", len(output_file))
+
         return output_file
 
     def compress_to_file(self, data: str, filename: str):
@@ -64,8 +99,28 @@ class LZW:
         """
         compressed = self.compression(data)
 
-        with open(f"{filename}_compr_lwz.pkl", "wb") as f:
-            pickle.dump(compressed, f)
+        asia = ""
+        for i in compressed:
+            b = bin(i)[2:]
+            if len(b) < 16:
+                # print("in if")
+                b = b.zfill(16)
+                # b = "1" + b
+            asia += b
+
+        asia = "1" + asia
+
+        binary_data = int(asia, 2)
+        bytes_data = binary_data.to_bytes(
+            (binary_data.bit_length() + 7) // 8, byteorder="big"
+        )
+
+        # print("binar", binary_data)
+
+        with open(f"./{filename}_lzw_final.bin", "wb") as f:
+            f.write(bytes_data)
+
+        # return compressed
 
     def decompression(self, compressed: list):
         """
@@ -133,12 +188,74 @@ class LZW:
         parametrit:
             filename: purettavan tiedoston nimen etuosa
         """
-        with open(f"{filename}_compr_lwz.pkl", "rb") as f:
-            output = pickle.load(f)
+        # with open(f"{filename}_compr_lwz_TEST.pkl", "rb") as f:
+        #     output = pickle.load(f)
 
-        a = self.decompression(output)
+        with open(f"./{filename}_lzw_final.bin", "rb") as f:
+            output = f.read()
+
+        binary = bin(int.from_bytes(output, byteorder="big"))
+        binary = binary[3:]
+
+        # print("TYYPPI:", type(output))
+
+        lista = []
+        #TODO: tääl joku ongelma
+        # binary -1 ?? or?? what??
+        for i in range(0, len(binary), 16):
+            luku = ""
+            add = True
+            for j in range(16):
+                    # print(output[j+i])
+                    if j+i < len(binary):
+                        luku += binary[j+i]
+                    else:
+                        add = False
+                        print("wää luku:", luku)
+            if add:
+                lista.append(int(luku, 2))
+
+        print("len:", len(lista))
+        print("listaeka:", lista[0])
+        print("lista_x", lista[x])
+        print("listavika:", lista[len(lista) -1])
+
+        a = self.decompression(lista)
         print("Yay done")
 
-        with open(f"./{filename}_decompr_lwz.pkl", "w") as f:
+        with open(f"./{filename}_decompr_lwz_FINAL.txt", "w") as f:
             f.write(a)
         return a
+
+
+if __name__ == "__main__":
+    lw = LZW()
+
+    string = "banana_bandana"
+
+    name = "holmesx"
+    # name = "testi"
+    with open(f"./src/tests/files/{name}.txt") as f:
+        file = f.read()
+    print("luettu")
+
+    # lorem_ipsum = "MOI TERVE JA HYVÄÄ PÄIVÄÄ"
+    # original_size = sys.getsizeof(lorem_ipsum)
+
+    # lorem_ipsum = string
+
+    # compr = lw.compression(file)
+    # # print(compr)
+    # decmp = lw.decompression(compr)
+    # print(decmp)
+
+    lw.compress_to_file(file, name)
+
+    decmp = lw.decompress_from_file(name)
+
+    # print(decmp)
+
+    if file == decmp:
+        print("yay")
+    else:
+        print("höh")
