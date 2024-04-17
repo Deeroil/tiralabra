@@ -1,35 +1,3 @@
-import pickle
-import sys
-
-# x = 7000
-x = 965120 #vika
-x = 450000
-
-
-# ei käytössäs
-def bytes_helper(data: str):
-    """
-    Muuntaa merkkijonoesityksen binääristä tavuiksi.
-    Huom. lisää annetun binäärin alkuun luvun 1, jotta alussa
-    olevat 0-bitit eivät katoa.
-
-    Parametri: merkkijonoesitys binääristä
-
-    Palauttaa: tavun
-
-    esimerkki:
-    Parametri: "001"
-    Palauttaa: tavuja, joka kuvastaa binäärilukua "1001"
-    """
-
-    # print("data", data)
-    data = "1" + data
-    binary_data = int(data, 2)
-    bytes_data = binary_data.to_bytes(
-        (binary_data.bit_length() + 7) // 8, byteorder="big"
-    )
-    return bytes_data
-
 class LZW:
     """
     Toteuttaa Lempel-Ziv-Welch pakkausalgoritmin,
@@ -80,18 +48,16 @@ class LZW:
         output_file.append(string_table[s])
 
         print("compr valmis")
-
-        print("listaeka:", output_file[0])
-        print("listax:", output_file[x])
-        print("listavika:", output_file[len(output_file) -1])
-        print("len:", len(output_file))
+        # print("listaeka:", output_file[0])
+        # print("listavika:", output_file[len(output_file) -1])
+        # print("len:", len(output_file))
 
         return output_file
 
     def compress_to_file(self, data: str, filename: str):
         """
         LZW tiedostoon kompressoiminen.
-        Tallentuu tiedostoksi "filename_compr_lwz.pkl"
+        Tallentuu tiedostoksi "filename__lzw_final.bin"
 
         parametrit:
             data: merkkijonoesitys kompressoitavasta datasta
@@ -102,10 +68,8 @@ class LZW:
         asia = ""
         for i in compressed:
             b = bin(i)[2:]
-            if len(b) < 16:
-                # print("in if")
-                b = b.zfill(16)
-                # b = "1" + b
+            if len(b) < 32:
+                b = b.zfill(32)
             asia += b
 
         asia = "1" + asia
@@ -115,12 +79,8 @@ class LZW:
             (binary_data.bit_length() + 7) // 8, byteorder="big"
         )
 
-        # print("binar", binary_data)
-
         with open(f"./{filename}_lzw_final.bin", "wb") as f:
             f.write(bytes_data)
-
-        # return compressed
 
     def decompression(self, compressed: list):
         """
@@ -183,7 +143,7 @@ class LZW:
     def decompress_from_file(self, filename: str):
         """
         LZW tiedostostosta purkaminen.
-        Luetaan tiedostosta "filename_compr_lwz.pkl"
+        Luetaan tiedostosta "filename_lzw_final.bin"
 
         parametrit:
             filename: purettavan tiedoston nimen etuosa
@@ -200,25 +160,20 @@ class LZW:
         # print("TYYPPI:", type(output))
 
         lista = []
-        #TODO: tääl joku ongelma
-        # binary -1 ?? or?? what??
-        for i in range(0, len(binary), 16):
+        for i in range(0, len(binary), 32):
             luku = ""
             add = True
-            for j in range(16):
-                    # print(output[j+i])
-                    if j+i < len(binary):
-                        luku += binary[j+i]
-                    else:
-                        add = False
-                        print("wää luku:", luku)
+            for j in range(32):
+                if j + i < len(binary):
+                    luku += binary[j + i]
+                else:
+                    add = False
             if add:
                 lista.append(int(luku, 2))
 
-        print("len:", len(lista))
-        print("listaeka:", lista[0])
-        print("lista_x", lista[x])
-        print("listavika:", lista[len(lista) -1])
+        # print("len:", len(lista))
+        # print("listaeka:", lista[0])
+        # print("listavika:", lista[len(lista) -1])
 
         a = self.decompression(lista)
         print("Yay done")
@@ -233,7 +188,7 @@ if __name__ == "__main__":
 
     string = "banana_bandana"
 
-    name = "holmesx"
+    name = "holmes"
     # name = "testi"
     with open(f"./src/tests/files/{name}.txt") as f:
         file = f.read()
